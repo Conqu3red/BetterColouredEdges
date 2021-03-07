@@ -19,7 +19,7 @@ namespace BetterColouredEdges
     [BepInProcess("Poly Bridge 2.exe")]
     public class PluginMain : PolyTechMod
     {
-        public const String PluginGuid = "polytech.bettercolorededges";
+        public const String PluginGuid = "polytech.bettercolourededges";
         public const String PluginName = "Better Coloured Edges";
         public const String PluginVersion = "1.0.0";
 
