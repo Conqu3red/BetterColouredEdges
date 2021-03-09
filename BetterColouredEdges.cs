@@ -56,10 +56,11 @@ namespace BetterColouredEdges
             var harmony = new Harmony(PluginGuid);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
             
+            shouldSaveData = true;
+            
             SetupTotalHotkeys();
             SetupSettings();
 
-            shouldSaveData = true;
             PolyTechMain.registerMod(this);
         }
 
@@ -67,6 +68,7 @@ namespace BetterColouredEdges
         {
             save = Config.Bind(Convert.ToChar(0x356) + "*General*", "Save data to layouts", true, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 0 }));
             save.SettingChanged += (o, e) => { shouldSaveData = save.Value; };
+            shouldSaveData = save.Value;
             TotalHotkeys = Config.Bind(Convert.ToChar(0x356) + "*General*", "Amount Of Keybinds (Needs Menu Reload)", hotkeysToResetTo, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 0 }));
 
             ColorHydraulicPistons = Config.Bind(Convert.ToChar(0x356) + "*General*", "Color Hydraulic Pistons", false, new ConfigDescription("Toggles coloring the hydraulic piston.", null, new ConfigurationManagerAttributes { Order = 0 }));
@@ -522,10 +524,11 @@ namespace BetterColouredEdges
 
         public static byte[] Serialize(){
             List<byte> bytes = new List<byte>();
-            bytes.AddRange(ByteSerializer.SerializeInt(BridgeEdges.m_Edges.Count));
+            int edgeCount = 0;
             edgeData = new Dictionary<string, Color> {};
             foreach (var edge in BridgeEdges.m_Edges){
                 if (edge.gameObject.activeInHierarchy){
+                    edgeCount += 1;
                     Color color = edge.m_MeshRenderer.material.color;
                         
                         if (edge.m_Material.m_MaterialType == BridgeMaterialType.HYDRAULICS)
@@ -538,6 +541,7 @@ namespace BetterColouredEdges
                     edgeData[SaveManager.getEdgeKey(edge)] = color;
                 }
             }
+            bytes.AddRange(ByteSerializer.SerializeInt(edgeCount));
             foreach (var key in edgeData.Keys){
                 bytes.AddRange(ByteSerializer.SerializeString(key));
                 bytes.AddRange(ByteSerializer.SerializeColor(edgeData[key]));
